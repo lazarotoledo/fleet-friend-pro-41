@@ -14,6 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      acessorios: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          observacao: string | null
+          patrimonio: string | null
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          observacao?: string | null
+          patrimonio?: string | null
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          observacao?: string | null
+          patrimonio?: string | null
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acessorios_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      arquivos_veiculo: {
+        Row: {
+          caminho: string
+          categoria: string
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          caminho: string
+          categoria: string
+          created_at?: string
+          id?: string
+          nome: string
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          caminho?: string
+          categoria?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arquivos_veiculo_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipes: {
         Row: {
           created_at: string
@@ -117,6 +193,7 @@ export type Database = {
       }
       manutencoes: {
         Row: {
+          condutor: string | null
           created_at: string
           custo: number | null
           data: string
@@ -129,6 +206,7 @@ export type Database = {
           veiculo_id: string
         }
         Insert: {
+          condutor?: string | null
           created_at?: string
           custo?: number | null
           data?: string
@@ -141,6 +219,7 @@ export type Database = {
           veiculo_id: string
         }
         Update: {
+          condutor?: string | null
           created_at?: string
           custo?: number | null
           data?: string
@@ -155,6 +234,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "manutencoes_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      multas: {
+        Row: {
+          created_at: string
+          data_hora: string
+          id: string
+          infracao: string | null
+          local: string | null
+          motorista: string | null
+          user_id: string
+          valor: number | null
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_hora: string
+          id?: string
+          infracao?: string | null
+          local?: string | null
+          motorista?: string | null
+          user_id?: string
+          valor?: number | null
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          data_hora?: string
+          id?: string
+          infracao?: string | null
+          local?: string | null
+          motorista?: string | null
+          user_id?: string
+          valor?: number | null
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "multas_veiculo_id_fkey"
             columns: ["veiculo_id"]
             isOneToOne: false
             referencedRelation: "veiculos"
