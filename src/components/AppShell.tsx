@@ -46,6 +46,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/equipes" className="flex items-center gap-1 rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>
               <Users className="h-4 w-4" /> Equipes
             </Link>
+            <Link to="/risco" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>
+              Km & Risco
+            </Link>
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="hidden opacity-75 sm:inline">{session.user.email}</span>
