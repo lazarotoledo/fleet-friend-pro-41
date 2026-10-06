@@ -83,7 +83,7 @@ export function alertas(v: Veiculo, manut: Manutencao[]): Alerta[] {
 export function projecaoKm(v: Veiculo, leituras: Leitura[]) {
   const ls = [...leituras].sort((a, b) => a.mes.localeCompare(b.mes));
   const pontos = [{ km: v.km_inicial }, ...ls.map((l) => ({ km: l.km }))];
-  const deltas = pontos.slice(1).map((p, i) => p.km - pontos[i].km).filter((d) => d >= 0);
+  const deltas = pontos.slice(1).map((p, i) => p.km - pontos[i]!.km).filter((d) => d >= 0);
   const recentes = deltas.slice(-3);
   const mediaMensal = recentes.length ? Math.round(recentes.reduce((a, b) => a + b, 0) / recentes.length) : null;
   const c = contrato(v);
