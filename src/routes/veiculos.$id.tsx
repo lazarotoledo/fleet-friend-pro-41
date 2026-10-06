@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { alertas, contrato, fmtDate, fmtKm, fmtMoney, fmtMonth, kmComparativo, TIPOS_MANUTENCAO, type TipoManutencao, type Veiculo } from "@/lib/fleet";
+import { Acessorios, Arquivos, Multas } from "@/components/VehicleExtras";
 
 export const Route = createFileRoute("/veiculos/$id")({
   head: () => ({
@@ -66,16 +67,24 @@ function Detalhe() {
         </div>
       )}
       <Tabs defaultValue="info">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap">
           <TabsTrigger value="info">Informações</TabsTrigger>
           <TabsTrigger value="km">Quilometragem</TabsTrigger>
           <TabsTrigger value="manut">Manutenções</TabsTrigger>
           <TabsTrigger value="sin">Sinistros</TabsTrigger>
+          <TabsTrigger value="multas">Multas</TabsTrigger>
+          <TabsTrigger value="acess">Acessórios</TabsTrigger>
+          <TabsTrigger value="check">Checklist</TabsTrigger>
+          <TabsTrigger value="docs">Documentos</TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="mt-6"><Info v={v} hist={data.hist} onDone={refresh} /></TabsContent>
         <TabsContent value="km" className="mt-6"><Km v={v} leit={data.leit} onDone={refresh} /></TabsContent>
         <TabsContent value="manut" className="mt-6"><Manut v={v} lista={data.manut} onDone={refresh} /></TabsContent>
         <TabsContent value="sin" className="mt-6"><Sin v={v} lista={data.sin} onDone={refresh} /></TabsContent>
+        <TabsContent value="multas" className="mt-6"><Multas veiculoId={v.id} /></TabsContent>
+        <TabsContent value="acess" className="mt-6"><Acessorios veiculoId={v.id} /></TabsContent>
+        <TabsContent value="check" className="mt-6"><Arquivos veiculoId={v.id} categoria="checklist" /></TabsContent>
+        <TabsContent value="docs" className="mt-6"><Arquivos veiculoId={v.id} categoria="documento" /></TabsContent>
       </Tabs>
     </div>
   );
@@ -154,7 +163,6 @@ function Info({ v, hist, onDone }: { v: Veiculo; hist: { id: string; equipe_id: 
           </div>
           {c?.pct != null && <div className="mt-4 h-2 rounded-full bg-muted"><div className="h-full rounded-full bg-accent" style={{ width: `${c.pct}%` }} /></div>}
         </Card>
-        <Card title="Condições"><p className="whitespace-pre-wrap text-sm">{v.condicoes || "—"}</p></Card>
         <Card title="Cobertura do seguro"><p className="whitespace-pre-wrap text-sm">{v.cobertura_seguro || "—"}</p></Card>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setEdit(true)}>Editar informações</Button>
