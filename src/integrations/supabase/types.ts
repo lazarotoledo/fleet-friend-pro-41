@@ -14,7 +14,269 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      equipes: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      historico_equipes: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          equipe_id: string | null
+          id: string
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          equipe_id?: string | null
+          id?: string
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          equipe_id?: string | null
+          id?: string
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_equipes_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_equipes_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leituras_km: {
+        Row: {
+          created_at: string
+          id: string
+          km: number
+          mes: string
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          km: number
+          mes: string
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          km?: number
+          mes?: string
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leituras_km_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manutencoes: {
+        Row: {
+          created_at: string
+          custo: number | null
+          data: string
+          descricao: string | null
+          id: string
+          km: number | null
+          proximo_km: number | null
+          tipo: string
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          custo?: number | null
+          data?: string
+          descricao?: string | null
+          id?: string
+          km?: number | null
+          proximo_km?: number | null
+          tipo: string
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          custo?: number | null
+          data?: string
+          descricao?: string | null
+          id?: string
+          km?: number | null
+          proximo_km?: number | null
+          tipo?: string
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manutencoes_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sinistros: {
+        Row: {
+          created_at: string
+          data: string
+          detalhamento: string | null
+          envolvidos: string | null
+          id: string
+          motorista: string | null
+          relato: string | null
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          detalhamento?: string | null
+          envolvidos?: string | null
+          id?: string
+          motorista?: string | null
+          relato?: string | null
+          user_id?: string
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          detalhamento?: string | null
+          envolvidos?: string | null
+          id?: string
+          motorista?: string | null
+          relato?: string | null
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sinistros_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      veiculos: {
+        Row: {
+          cobertura_seguro: string | null
+          condicoes: string | null
+          cor: string | null
+          created_at: string
+          equipe_id: string | null
+          fim_contrato: string | null
+          id: string
+          inicio_contrato: string | null
+          intervalo_oleo_km: number | null
+          intervalo_pneu_km: number | null
+          km_atual: number
+          km_inicial: number
+          km_mensal_contratado: number | null
+          modelo: string | null
+          placa: string
+          rastreado: boolean
+          user_id: string
+          valor_contrato: number | null
+        }
+        Insert: {
+          cobertura_seguro?: string | null
+          condicoes?: string | null
+          cor?: string | null
+          created_at?: string
+          equipe_id?: string | null
+          fim_contrato?: string | null
+          id?: string
+          inicio_contrato?: string | null
+          intervalo_oleo_km?: number | null
+          intervalo_pneu_km?: number | null
+          km_atual?: number
+          km_inicial?: number
+          km_mensal_contratado?: number | null
+          modelo?: string | null
+          placa: string
+          rastreado?: boolean
+          user_id?: string
+          valor_contrato?: number | null
+        }
+        Update: {
+          cobertura_seguro?: string | null
+          condicoes?: string | null
+          cor?: string | null
+          created_at?: string
+          equipe_id?: string | null
+          fim_contrato?: string | null
+          id?: string
+          inicio_contrato?: string | null
+          intervalo_oleo_km?: number | null
+          intervalo_pneu_km?: number | null
+          km_atual?: number
+          km_inicial?: number
+          km_mensal_contratado?: number | null
+          modelo?: string | null
+          placa?: string
+          rastreado?: boolean
+          user_id?: string
+          valor_contrato?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "veiculos_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
