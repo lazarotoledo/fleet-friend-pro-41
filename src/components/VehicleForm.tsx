@@ -61,7 +61,6 @@ export function VehicleForm({ initial, onSubmit, saving }: { initial?: VeiculoIn
       <div />
       <F label="Intervalo troca de óleo (km)"><Input type="number" min={0} value={v.intervalo_oleo_km ?? ""} onChange={(e) => set("intervalo_oleo_km", num(e.target.value))} /></F>
       <F label="Intervalo troca de pneu (km)"><Input type="number" min={0} value={v.intervalo_pneu_km ?? ""} onChange={(e) => set("intervalo_pneu_km", num(e.target.value))} /></F>
-      <F label="Condições do contrato" full><Textarea maxLength={2000} value={v.condicoes ?? ""} onChange={(e) => set("condicoes", e.target.value)} /></F>
       <F label="Cobertura do seguro" full><Textarea maxLength={2000} value={v.cobertura_seguro ?? ""} onChange={(e) => set("cobertura_seguro", e.target.value)} /></F>
       <div className="sm:col-span-2 flex justify-end"><Button disabled={saving}>Salvar</Button></div>
     </form>
