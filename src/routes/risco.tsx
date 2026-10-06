@@ -72,6 +72,7 @@ function Risco() {
     toast.success(`${rows.length} registro(s) salvos`);
     setVals({});
     qc.invalidateQueries();
+    return undefined;
   };
 
   const rodarIA = async () => {
