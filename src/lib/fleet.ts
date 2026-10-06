@@ -78,3 +78,19 @@ export function alertas(v: Veiculo, manut: Manutencao[]): Alerta[] {
   if (c?.restantes != null && c.restantes <= 2) out.push({ tipo: "aviso", texto: c.restantes === 0 ? "Contrato vencendo/vencido" : `Contrato termina em ${c.restantes} mês(es)` });
   return out;
 }
+
+/** Projeção de km até o fim do contrato a partir das leituras mensais (odômetro). */
+export function projecaoKm(v: Veiculo, leituras: Leitura[]) {
+  const ls = [...leituras].sort((a, b) => a.mes.localeCompare(b.mes));
+  const pontos = [{ km: v.km_inicial }, ...ls.map((l) => ({ km: l.km }))];
+  const deltas = pontos.slice(1).map((p, i) => p.km - pontos[i]!.km).filter((d) => d >= 0);
+  const recentes = deltas.slice(-3);
+  const mediaMensal = recentes.length ? Math.round(recentes.reduce((a, b) => a + b, 0) / recentes.length) : null;
+  const c = contrato(v);
+  const limiteTotal = c?.total && v.km_mensal_contratado ? c.total * v.km_mensal_contratado : null;
+  const kmAtual = Math.max(v.km_atual, ls.at(-1)?.km ?? 0);
+  const rodado = kmAtual - v.km_inicial;
+  const projetadoTotal = mediaMensal != null && c?.restantes != null ? rodado + mediaMensal * c.restantes : null;
+  const excesso = projetadoTotal != null && limiteTotal != null ? projetadoTotal - limiteTotal : null;
+  return { mediaMensal, rodado, limiteTotal, projetadoTotal, excesso, mesesRestantes: c?.restantes ?? null };
+}
