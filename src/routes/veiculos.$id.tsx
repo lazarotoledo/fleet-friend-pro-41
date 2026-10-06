@@ -94,7 +94,7 @@ function AtualizarKm({ v, onDone }: { v: Veiculo; onDone: () => void }) {
     const n = Number(km);
     if (!km || n < 0) return;
     const { error } = await supabase.from("veiculos").update({ km_atual: n }).eq("id", v.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     const mes = new Date(); mes.setDate(1);
     await supabase.from("leituras_km").upsert({ veiculo_id: v.id, mes: mes.toISOString().slice(0, 10), km: n }, { onConflict: "veiculo_id,mes" });
     setKm(""); toast.success("Km atualizado"); onDone();
@@ -187,13 +187,13 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
   const k = kmComparativo(v);
   const contratado = v.km_mensal_contratado;
   const linhas = leit.map((l, i) => {
-    const anterior = i === 0 ? v.km_inicial : leit[i - 1].km;
+    const anterior = i === 0 ? v.km_inicial : leit[i - 1]!.km;
     return { ...l, rodado: l.km - anterior };
   });
   const add = async () => {
     if (!km) return;
     const { error } = await supabase.from("leituras_km").upsert({ veiculo_id: v.id, mes: mes + "-01", km: Number(km) }, { onConflict: "veiculo_id,mes" });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     const maior = Math.max(Number(km), ...leit.map((l) => l.km));
     if (maior > v.km_atual) await supabase.from("veiculos").update({ km_atual: maior }).eq("id", v.id);
     setKm(""); onDone();
@@ -256,7 +256,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
       veiculo_id: v.id, tipo: f.tipo, data: f.data, km: f.km ? Number(f.km) : null,
       proximo_km: f.proximo_km ? Number(f.proximo_km) : proxDefault, custo: f.custo ? Number(f.custo) : null, descricao: f.descricao.slice(0, 2000) || null,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Manutenção registrada"); setF({ ...f, proximo_km: "", custo: "", descricao: "" }); onDone();
   };
   const del = async (id: string) => { await supabase.from("manutencoes").delete().eq("id", id); onDone(); };
@@ -291,7 +291,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
       <Card title="Histórico">
         <div className="mb-4 flex flex-wrap gap-1">
           {[["todos", "Todos"], ...Object.entries(TIPOS_MANUTENCAO)].map(([k, l]) => (
-            <button key={k} onClick={() => setFiltro(k)} className={`rounded-full px-3 py-1 text-xs font-medium ${filtro === k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{l}</button>
+            <button key={k} onClick={() => setFiltro(k ?? "todos")} className={`rounded-full px-3 py-1 text-xs font-medium ${filtro === k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{l}</button>
           ))}
         </div>
         {filtrada.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum registro.</p> : (
@@ -317,9 +317,9 @@ function Sin({ v, lista, onDone }: { v: Veiculo; lista: { id: string; data: stri
   const vazio = { data: new Date().toISOString().slice(0, 10), motorista: "", relato: "", detalhamento: "", envolvidos: "" };
   const [f, setF] = useState(vazio);
   const add = async () => {
-    if (!f.motorista.trim() && !f.relato.trim()) return toast.error("Informe ao menos motorista ou relato");
+    if (!f.motorista.trim() && !f.relato.trim()) { toast.error("Informe ao menos motorista ou relato"); return; }
     const { error } = await supabase.from("sinistros").insert({ veiculo_id: v.id, data: f.data, motorista: f.motorista.slice(0, 120), relato: f.relato.slice(0, 4000), detalhamento: f.detalhamento.slice(0, 4000), envolvidos: f.envolvidos.slice(0, 2000) });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Sinistro registrado"); setF(vazio); onDone();
   };
   const del = async (id: string) => { if (confirm("Excluir sinistro?")) { await supabase.from("sinistros").delete().eq("id", id); onDone(); } };

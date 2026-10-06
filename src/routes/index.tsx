@@ -42,7 +42,7 @@ function Painel() {
     mutationFn: async (input: VeiculoInput) => {
       const { data, error } = await supabase.from("veiculos").insert(input as never).select().single();
       if (error) throw error;
-      if (data.equipe_id) await supabase.from("historico_equipes").insert({ veiculo_id: data.id, equipe_id: data.equipe_id, data_inicio: data.inicio_contrato ?? undefined });
+      if (data.equipe_id) await supabase.from("historico_equipes").insert({ veiculo_id: data.id, equipe_id: data.equipe_id, data_inicio: data.inicio_contrato ?? new Date().toISOString().slice(0, 10) });
     },
     onSuccess: () => { toast.success("Veículo cadastrado"); setOpen(false); qc.invalidateQueries(); },
     onError: (e: Error) => toast.error(e.message),
