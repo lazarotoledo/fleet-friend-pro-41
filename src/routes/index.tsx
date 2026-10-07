@@ -1,3 +1,4 @@
+import { AdminOnly } from "@/components/Access";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -13,6 +14,8 @@ import { alertas, contrato, fmtKm, kmComparativo } from "@/lib/fleet";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Veículos — Frota" },
       { name: "description", content: "Painel da frota com alertas de manutenção, km e contratos." },
       { property: "og:title", content: "Veículos — Frota" },
@@ -28,13 +31,15 @@ function Painel() {
   const { data, isLoading } = useQuery({
     queryKey: ["painel"],
     queryFn: async () => {
-      const [v, m, e] = await Promise.all([
+      const [v, m, e, l] = await Promise.all([
         supabase.from("veiculos").select("*").order("placa"),
         supabase.from("manutencoes").select("*"),
         supabase.from("equipes").select("*"),
+        supabase.from("leituras_km").select("*"),
       ]);
       if (v.error) throw v.error;
-      return { veiculos: v.data, manut: m.data ?? [], equipes: e.data ?? [] };
+      if (l.error) throw l.error;
+      return { veiculos: v.data, manut: m.data ?? [], equipes: e.data ?? [], leituras: l.data ?? [] };
     },
   });
 
@@ -49,7 +54,7 @@ function Painel() {
   });
 
   const veiculos = data?.veiculos ?? [];
-  const lista = veiculos.map((v) => ({ v, a: alertas(v, data!.manut) }));
+  const lista = veiculos.map((v) => ({ v, a: alertas(v, data?.manut ?? [], data?.leituras ?? []) }));
   const comAlerta = lista.filter((x) => x.a.length);
 
   return (
@@ -59,7 +64,7 @@ function Painel() {
           <h1 className="text-3xl font-semibold">Veículos</h1>
           <p className="text-muted-foreground">{veiculos.length} na frota · {comAlerta.length} com alertas</p>
         </div>
-        <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Novo veículo</Button>
+        <AdminOnly><Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Novo veículo</Button></AdminOnly>
       </div>
 
       {comAlerta.length > 0 && (
@@ -113,12 +118,12 @@ function Painel() {
         </div>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <AdminOnly><Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader><DialogTitle>Novo veículo</DialogTitle></DialogHeader>
           <VehicleForm onSubmit={(v) => criar.mutate(v)} saving={criar.isPending} />
         </DialogContent>
-      </Dialog>
+      </Dialog></AdminOnly>
     </div>
   );
 }

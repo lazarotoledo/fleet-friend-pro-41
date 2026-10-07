@@ -1,3 +1,4 @@
+import { AdminOnly } from "@/components/Access";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -100,7 +101,7 @@ function Risco() {
           </div>
           <div className="flex items-end gap-2">
             <label className="text-sm">Mês<Input type="month" value={mes} onChange={(e) => setMes(e.target.value)} className="w-40" /></label>
-            <Button onClick={salvar} disabled={salvando}>{salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Salvar</Button>
+            <AdminOnly><Button onClick={salvar} disabled={salvando}>{salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Salvar</Button></AdminOnly>
           </div>
         </div>
         <div className="overflow-x-auto rounded-lg border bg-card">
@@ -123,8 +124,8 @@ function Risco() {
                       {p.projetadoTotal != null && p.limiteTotal != null ? `${fmtKm(p.projetadoTotal)} / ${fmtKm(p.limiteTotal)}` : "—"}
                     </td>
                     <td className="p-3">
-                      <Input type="number" min={0} className="w-36" placeholder={doMes ? String(doMes.km) : "Odômetro"}
-                        value={vals[v.id] ?? ""} onChange={(e) => setVals({ ...vals, [v.id]: e.target.value })} />
+                      <AdminOnly><Input type="number" min={0} className="w-36" placeholder={doMes ? String(doMes.km) : "Odômetro"}
+                        value={vals[v.id] ?? ""} onChange={(e) => setVals({ ...vals, [v.id]: e.target.value })} /></AdminOnly>
                     </td>
                   </tr>
                 );
@@ -141,9 +142,9 @@ function Risco() {
             <h2 className="font-display text-xl font-semibold">Análise de risco com IA</h2>
             <p className="text-sm text-muted-foreground">Identifica veículos que podem estourar o km contratado e sugere ações.</p>
           </div>
-          <Button onClick={rodarIA} disabled={carregando || !veiculos.length}>
+          <AdminOnly><Button onClick={rodarIA} disabled={carregando || !veiculos.length}>
             {carregando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {carregando ? "Analisando…" : "Analisar frota"}
-          </Button>
+          </Button></AdminOnly>
         </div>
         {analise && (
           <div className="space-y-3">

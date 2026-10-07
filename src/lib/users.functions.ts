@@ -27,7 +27,7 @@ export const inviteFleetUser = createServerFn({ method: "POST" })
     const request = getRequest();
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, { redirectTo: `${origin}/reset-password` });
+    const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(data.email, { redirectTo: `${origin}/reset-password?flow=invite` });
     if (inviteError) throw new Error(inviteError.message);
     const { error: roleError } = await supabaseAdmin.from("user_roles").insert({ user_id: invited.user.id, role: data.role });
     if (roleError) {

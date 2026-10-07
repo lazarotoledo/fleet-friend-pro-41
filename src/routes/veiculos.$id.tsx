@@ -1,3 +1,4 @@
+import { AdminOnly } from "@/components/Access";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -16,6 +17,8 @@ import { Acessorios, Arquivos, Multas } from "@/components/VehicleExtras";
 export const Route = createFileRoute("/veiculos/$id")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Detalhes do veículo — Frota" },
       { name: "description", content: "Contrato, quilometragem, manutenções e sinistros do veículo." },
       { property: "og:title", content: "Detalhes do veículo — Frota" },
@@ -49,7 +52,7 @@ function Detalhe() {
   if (isLoading) return <p className="text-muted-foreground">Carregando…</p>;
   if (!data?.v) return <p>Veículo não encontrado. <Link to="/" className="text-accent">Voltar</Link></p>;
   const v = data.v;
-  const al = alertas(v, data.manut);
+  const al = alertas(v, data.manut, data.leit);
 
   return (
     <div className="space-y-6">
@@ -59,7 +62,7 @@ function Detalhe() {
           <h1 className="text-4xl font-semibold tracking-wider">{v.placa}</h1>
           <p className="text-muted-foreground">{[v.modelo, v.cor, v.rastreado ? "Rastreado" : "Sem rastreador"].filter(Boolean).join(" · ")}</p>
         </div>
-        <AtualizarKm v={v} onDone={refresh} />
+        <AdminOnly><AtualizarKm v={v} onDone={refresh} /></AdminOnly>
       </div>
       {al.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -164,21 +167,21 @@ function Info({ v, hist, onDone }: { v: Veiculo; hist: { id: string; equipe_id: 
           {c?.pct != null && <div className="mt-4 h-2 rounded-full bg-muted"><div className="h-full rounded-full bg-accent" style={{ width: `${c.pct}%` }} /></div>}
         </Card>
         <Card title="Cobertura do seguro"><p className="whitespace-pre-wrap text-sm">{v.cobertura_seguro || "—"}</p></Card>
-        <div className="flex gap-2">
+        <AdminOnly><div className="flex gap-2">
           <Button variant="outline" onClick={() => setEdit(true)}>Editar informações</Button>
           <Button variant="ghost" className="text-destructive" onClick={excluir}><Trash2 className="h-4 w-4" /> Excluir</Button>
-        </div>
+        </div></AdminOnly>
       </div>
       <Card title="Equipe">
         <div className="mb-4 font-display text-xl font-semibold">{nome(v.equipe_id)}</div>
-        <div className="space-y-2">
+        <AdminOnly><div className="space-y-2">
           <select className={sel} value={nova} onChange={(e) => setNova(e.target.value)}>
             <option value="">Sem equipe</option>
             {equipes.map((q) => <option key={q.id} value={q.id}>{q.nome}</option>)}
           </select>
           <Input type="date" value={data} onChange={(e) => setData(e.target.value)} />
           <Button className="w-full" variant="secondary" onClick={trocar}>Mudar equipe</Button>
-        </div>
+        </div></AdminOnly>
         <h4 className="mb-2 mt-6 text-sm font-semibold text-muted-foreground">Histórico</h4>
         <ul className="space-y-2 text-sm">
           {hist.length === 0 && <li className="text-muted-foreground">Sem histórico</li>}
@@ -195,7 +198,7 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
   const k = kmComparativo(v);
   const contratado = v.km_mensal_contratado;
   const linhas = leit.map((l, i) => {
-    const anterior = i === 0 ? v.km_inicial : leit[i - 1]!.km;
+    const anterior = i === 0 ? v.km_inicial : (leit[i - 1]?.km ?? v.km_inicial);
     return { ...l, rodado: l.km - anterior };
   });
   const add = async () => {
@@ -220,11 +223,11 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
         </div>
       </Card>
       <Card title="Comparativo mensal">
-        <div className="mb-4 flex flex-wrap gap-2">
+        <AdminOnly><div className="mb-4 flex flex-wrap gap-2">
           <Input type="month" value={mes} onChange={(e) => setMes(e.target.value)} className="w-44" />
           <Input type="number" min={0} placeholder="Km no fim do mês (odômetro)" value={km} onChange={(e) => setKm(e.target.value)} className="w-60" />
           <Button onClick={add}>Registrar</Button>
-        </div>
+        </div></AdminOnly>
         {linhas.length === 0 ? <p className="text-sm text-muted-foreground">Registre o km de cada mês para ver o comparativo.</p> : (
           <div className="space-y-3">
             {linhas.map((l) => {
@@ -239,7 +242,7 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
                   <span className="flex items-center gap-2 tabular-nums">
                     <b className={acima ? "text-destructive" : ""}>{l.rodado.toLocaleString("pt-BR")}</b>
                     {contratado && <span className="text-muted-foreground">/ {contratado.toLocaleString("pt-BR")}</span>}
-                    <button onClick={() => del(l.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <AdminOnly><button onClick={() => del(l.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button></AdminOnly>
                   </span>
                 </div>
               );
@@ -285,7 +288,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
           );
         })}
       </div>
-      <Card title="Registrar manutenção">
+      <AdminOnly><Card title="Registrar manutenção">
         <div className="grid gap-4 sm:grid-cols-3">
           <F label="Tipo"><select className={sel} value={f.tipo} onChange={(e) => setF({ ...f, tipo: e.target.value as TipoManutencao })}>{Object.entries(TIPOS_MANUTENCAO).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></F>
           <F label="Data"><Input type="date" value={f.data} onChange={(e) => setF({ ...f, data: e.target.value })} /></F>
@@ -296,7 +299,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
           <div className="sm:col-span-3"><F label="Descrição"><Textarea maxLength={2000} value={f.descricao} onChange={(e) => setF({ ...f, descricao: e.target.value })} /></F></div>
         </div>
         <div className="mt-4 flex justify-end"><Button onClick={add}>Registrar</Button></div>
-      </Card>
+      </Card></AdminOnly>
       <Card title="Histórico">
         <div className="mb-4 flex flex-wrap gap-1">
           {[["todos", "Todos"], ...Object.entries(TIPOS_MANUTENCAO)].map(([k, l]) => (
@@ -312,7 +315,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
                   {m.descricao && <p className="mt-1 text-muted-foreground">{m.descricao}</p>}
                   {m.proximo_km && <p className="text-xs text-muted-foreground">Próxima: {fmtKm(m.proximo_km)}</p>}
                 </div>
-                <div className="flex items-center gap-3">{fmtMoney(m.custo)}<button onClick={() => del(m.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button></div>
+                <div className="flex items-center gap-3">{fmtMoney(m.custo)}<AdminOnly><button onClick={() => del(m.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button></AdminOnly></div>
               </li>
             ))}
           </ul>
@@ -335,7 +338,7 @@ function Sin({ v, lista, onDone }: { v: Veiculo; lista: { id: string; data: stri
 
   return (
     <div className="space-y-6">
-      <Card title="Registrar sinistro">
+      <AdminOnly><Card title="Registrar sinistro">
         <div className="grid gap-4 sm:grid-cols-2">
           <F label="Data"><Input type="date" value={f.data} onChange={(e) => setF({ ...f, data: e.target.value })} /></F>
           <F label="Motorista"><Input maxLength={120} value={f.motorista} onChange={(e) => setF({ ...f, motorista: e.target.value })} /></F>
@@ -344,12 +347,12 @@ function Sin({ v, lista, onDone }: { v: Veiculo; lista: { id: string; data: stri
           <F label="Envolvidos" full><Textarea maxLength={2000} placeholder="Nomes, placas, contatos de terceiros…" value={f.envolvidos} onChange={(e) => setF({ ...f, envolvidos: e.target.value })} /></F>
         </div>
         <div className="mt-4 flex justify-end"><Button onClick={add}>Registrar</Button></div>
-      </Card>
+      </Card></AdminOnly>
       {lista.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum sinistro registrado.</p> : lista.map((s) => (
         <Card key={s.id}>
           <div className="flex items-start justify-between">
             <div><div className="font-display font-semibold">{fmtDate(s.data)}</div><div className="text-sm text-muted-foreground">Motorista: {s.motorista || "—"}</div></div>
-            <button onClick={() => del(s.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+            <AdminOnly><button onClick={() => del(s.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button></AdminOnly>
           </div>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div><dt className="text-xs text-muted-foreground">Relato</dt><dd className="whitespace-pre-wrap">{s.relato || "—"}</dd></div>

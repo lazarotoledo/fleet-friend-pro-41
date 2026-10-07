@@ -1,3 +1,4 @@
+import { AdminOnly } from "@/components/Access";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Download, Trash2, Upload } from "lucide-react";
@@ -44,20 +45,20 @@ export function Acessorios({ veiculoId }: { veiculoId: string }) {
   const del = async (id: string) => { await supabase.from("acessorios").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["acessorios"] }); };
   return (
     <div className="space-y-6">
-      <Card title="Adicionar acessório da empresa">
+      <AdminOnly><Card title="Adicionar acessório da empresa">
         <div className="grid gap-4 sm:grid-cols-3">
           <F label="Item"><Input maxLength={120} placeholder="Ex.: escada, kit ferramentas" value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} /></F>
           <F label="Nº patrimônio"><Input maxLength={60} value={f.patrimonio} onChange={(e) => setF({ ...f, patrimonio: e.target.value })} /></F>
           <F label="Observação"><Input maxLength={500} value={f.observacao} onChange={(e) => setF({ ...f, observacao: e.target.value })} /></F>
         </div>
         <div className="mt-4 flex justify-end"><Button onClick={add}>Adicionar</Button></div>
-      </Card>
+      </Card></AdminOnly>
       <Card title="Acessórios no veículo">
         {data.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum acessório.</p> : (
           <ul className="divide-y">{data.map((a) => (
             <li key={a.id} className="flex items-center justify-between gap-4 py-3 text-sm">
               <div><span className="font-medium">{a.nome}</span>{a.patrimonio && <span className="text-muted-foreground"> · Patrimônio {a.patrimonio}</span>}{a.observacao && <p className="text-muted-foreground">{a.observacao}</p>}</div>
-              <Del onClick={() => del(a.id)} />
+              <AdminOnly><Del onClick={() => del(a.id)} /></AdminOnly>
             </li>))}
           </ul>)}
       </Card>
@@ -80,7 +81,7 @@ export function Multas({ veiculoId }: { veiculoId: string }) {
   const total = data.reduce((s, m) => s + Number(m.valor ?? 0), 0);
   return (
     <div className="space-y-6">
-      <Card title="Registrar multa">
+      <AdminOnly><Card title="Registrar multa">
         <div className="grid gap-4 sm:grid-cols-2">
           <F label="Data e hora"><Input type="datetime-local" value={f.data_hora} onChange={(e) => setF({ ...f, data_hora: e.target.value })} /></F>
           <F label="Local"><Input maxLength={200} value={f.local} onChange={(e) => setF({ ...f, local: e.target.value })} /></F>
@@ -89,7 +90,7 @@ export function Multas({ veiculoId }: { veiculoId: string }) {
           <F label="Qual multa (infração)" full><Input maxLength={300} value={f.infracao} onChange={(e) => setF({ ...f, infracao: e.target.value })} /></F>
         </div>
         <div className="mt-4 flex justify-end"><Button onClick={add}>Registrar</Button></div>
-      </Card>
+      </Card></AdminOnly>
       <Card title={`Multas · total ${fmtMoney(total)}`}>
         {data.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma multa.</p> : (
           <ul className="divide-y">{data.map((m) => (
@@ -98,7 +99,7 @@ export function Multas({ veiculoId }: { veiculoId: string }) {
                 <div className="font-medium">{m.infracao || "Multa"}</div>
                 <div className="text-muted-foreground">{new Date(m.data_hora).toLocaleString("pt-BR")} · {m.local || "—"} · Motorista: {m.motorista || "—"}</div>
               </div>
-              <div className="flex items-center gap-3">{fmtMoney(m.valor)}<Del onClick={() => del(m.id)} /></div>
+              <div className="flex items-center gap-3">{fmtMoney(m.valor)}<AdminOnly><Del onClick={() => del(m.id)} /></AdminOnly></div>
             </li>))}
           </ul>)}
       </Card>
@@ -131,8 +132,9 @@ export function Arquivos({ veiculoId, categoria }: { veiculoId: string; categori
     if (!files?.length) return;
     setEnviando(true);
     const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { setEnviando(false); toast.error("Entre novamente."); return; }
     for (const file of Array.from(files)) {
-      const caminho = `${u.user!.id}/${veiculoId}/${categoria}/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+      const caminho = `${u.user.id}/${veiculoId}/${categoria}/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g, "_")}`;
       const up = await supabase.storage.from("frota").upload(caminho, file);
       if (up.error) { toast.error(up.error.message); continue; }
       await supabase.from("arquivos_veiculo").insert({ veiculo_id: veiculoId, categoria, nome: file.name.slice(0, 200), caminho });
@@ -154,10 +156,10 @@ export function Arquivos({ veiculoId, categoria }: { veiculoId: string; categori
   return (
     <div className="space-y-6">
       <Card title={fotos ? "Fotos do checklist" : "Documentos do veículo"}>
-        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 text-sm text-muted-foreground hover:bg-muted">
+        <AdminOnly><label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 text-sm text-muted-foreground hover:bg-muted">
           <Upload className="h-4 w-4" /> {enviando ? "Enviando…" : fotos ? "Adicionar fotos" : "Adicionar documentos (PDF, imagem…)"}
           <input type="file" multiple hidden accept={fotos ? "image/*" : undefined} disabled={enviando} onChange={(e) => { upload(e.target.files); e.target.value = ""; }} />
-        </label>
+        </label></AdminOnly>
         {fotos && <p className="mt-2 text-xs text-muted-foreground">O questionário do checklist entra aqui quando você enviar as perguntas.</p>}
       </Card>
       <Card>
@@ -167,7 +169,7 @@ export function Arquivos({ veiculoId, categoria }: { veiculoId: string; categori
               <div><div className="font-medium">{a.nome}</div><div className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString("pt-BR")}</div></div>
               <div className="flex items-center gap-3">
                 <Button size="sm" variant="outline" onClick={() => baixar(a.caminho, a.nome)}><Download className="mr-1 h-4 w-4" />Salvar na pasta</Button>
-                <Del onClick={() => del(a.id, a.caminho)} />
+                <AdminOnly><Del onClick={() => del(a.id, a.caminho)} /></AdminOnly>
               </div>
             </li>))}
           </ul>)}

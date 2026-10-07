@@ -21,7 +21,8 @@ function Password() {
   const [saving, setSaving] = useState(false);
   useEffect(() => {
     const type = new URLSearchParams(window.location.hash.slice(1)).get("type");
-    if (type !== "recovery" && type !== "invite") return;
+    const flow = new URLSearchParams(window.location.search).get("flow");
+    if (type !== "recovery" && type !== "invite" && flow !== "recovery" && flow !== "invite") return;
     supabase.auth.getUser().then(({ data }) => setValid(!!data.user));
   }, []);
   return <main className="flex min-h-screen items-center justify-center px-4"><form className="w-full max-w-sm space-y-4" onSubmit={async (e) => {
