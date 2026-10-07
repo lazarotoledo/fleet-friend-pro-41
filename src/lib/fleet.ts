@@ -53,7 +53,22 @@ export function kmComparativo(v: Veiculo) {
 
 export type Alerta = { tipo: "erro" | "aviso"; texto: string };
 
-export function alertas(v: Veiculo, manut: Manutencao[]): Alerta[] {
+/** Um salto entre meses não é comparado com uma única franquia mensal. */
+export function kmMensal(v: Veiculo, leituras: Pick<Leitura, "veiculo_id" | "mes" | "km">[]) {
+  const ls = leituras.filter((l) => l.veiculo_id === v.id).sort((a, b) => a.mes.localeCompare(b.mes));
+  return ls.flatMap((l, i) => {
+    const anterior = ls[i - 1];
+    const inicio = v.inicio_contrato;
+    const mesAnterior = anterior?.mes;
+    const indiceMes = (mes: string) => Number(mes.slice(0, 4)) * 12 + Number(mes.slice(5, 7));
+    const consecutivo = mesAnterior ? indiceMes(l.mes) - indiceMes(mesAnterior) === 1 : inicio?.slice(0, 7) === l.mes.slice(0, 7);
+    if (!consecutivo) return [];
+    const rodado = l.km - (anterior?.km ?? v.km_inicial);
+    return rodado < 0 ? [] : [{ mes: l.mes, rodado }];
+  });
+}
+
+export function alertas(v: Veiculo, manut: Manutencao[], leituras: Pick<Leitura, "veiculo_id" | "mes" | "km">[] = []): Alerta[] {
   const out: Alerta[] = [];
   const ultimo = (t: TipoManutencao, intervalo: number | null) => {
     const m = manut
@@ -70,6 +85,10 @@ export function alertas(v: Veiculo, manut: Manutencao[]): Alerta[] {
   };
   check("Troca de óleo", ultimo("oleo", v.intervalo_oleo_km));
   check("Troca de pneu", ultimo("pneu", v.intervalo_pneu_km));
+  const mensal = kmMensal(v, leituras).at(-1);
+  if (mensal && v.km_mensal_contratado != null && mensal.rodado > v.km_mensal_contratado) {
+    out.push({ tipo: "erro", texto: `Km mensal excedido (${fmtMonth(mensal.mes)}): ${fmtKm(mensal.rodado)} / ${fmtKm(v.km_mensal_contratado)} — excesso de ${fmtKm(mensal.rodado - v.km_mensal_contratado)}` });
+  }
   const k = kmComparativo(v);
   if (k.diff != null && k.esperado) {
     if (k.diff > 0) out.push({ tipo: k.diff > k.esperado * 0.1 ? "erro" : "aviso", texto: `Acima do km contratado em ${fmtKm(k.diff)}` });
@@ -83,7 +102,7 @@ export function alertas(v: Veiculo, manut: Manutencao[]): Alerta[] {
 export function projecaoKm(v: Veiculo, leituras: Leitura[]) {
   const ls = [...leituras].sort((a, b) => a.mes.localeCompare(b.mes));
   const pontos = [{ km: v.km_inicial }, ...ls.map((l) => ({ km: l.km }))];
-  const deltas = pontos.slice(1).map((p, i) => p.km - pontos[i]!.km).filter((d) => d >= 0);
+  const deltas = pontos.slice(1).map((p, i) => p.km - (pontos[i]?.km ?? v.km_inicial)).filter((d) => d >= 0);
   const recentes = deltas.slice(-3);
   const mediaMensal = recentes.length ? Math.round(recentes.reduce((a, b) => a + b, 0) / recentes.length) : null;
   const c = contrato(v);

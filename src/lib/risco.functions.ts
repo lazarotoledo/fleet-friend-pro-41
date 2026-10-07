@@ -37,6 +37,8 @@ export const analisarRisco = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AnaliseRisco> => {
     const sb = context.supabase;
+    const { data: allowed, error: roleError } = await sb.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (roleError || !allowed) throw new Error("Somente o administrador pode solicitar uma análise.");
     const [v, l, e] = await Promise.all([
       sb.from("veiculos").select("*"),
       sb.from("leituras_km").select("*").order("mes"),
