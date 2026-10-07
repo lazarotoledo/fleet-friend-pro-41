@@ -252,8 +252,8 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
   );
 }
 
-function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: string; data: string; km: number | null; descricao: string | null; custo: number | null; proximo_km: number | null }[]; onDone: () => void }) {
-  const [f, setF] = useState({ tipo: "oleo" as TipoManutencao, data: new Date().toISOString().slice(0, 10), km: String(v.km_atual), proximo_km: "", custo: "", descricao: "" });
+function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: string; data: string; km: number | null; descricao: string | null; custo: number | null; proximo_km: number | null; condutor: string | null }[]; onDone: () => void }) {
+  const [f, setF] = useState({ tipo: "oleo" as TipoManutencao, data: new Date().toISOString().slice(0, 10), km: String(v.km_atual), proximo_km: "", custo: "", descricao: "", condutor: "" });
   const [filtro, setFiltro] = useState<string>("todos");
   const ultimo = (t: TipoManutencao) => lista.filter((m) => m.tipo === t && m.km != null).sort((a, b) => (b.km ?? 0) - (a.km ?? 0))[0];
   const proximo = (t: "oleo" | "pneu") => { const m = ultimo(t); const int = t === "oleo" ? v.intervalo_oleo_km : v.intervalo_pneu_km; return m?.proximo_km ?? (int ? (m?.km ?? v.km_inicial) + int : null); };
@@ -262,7 +262,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
     const proxDefault = f.tipo === "oleo" && v.intervalo_oleo_km ? Number(f.km) + v.intervalo_oleo_km : f.tipo === "pneu" && v.intervalo_pneu_km ? Number(f.km) + v.intervalo_pneu_km : null;
     const { error } = await supabase.from("manutencoes").insert({
       veiculo_id: v.id, tipo: f.tipo, data: f.data, km: f.km ? Number(f.km) : null,
-      proximo_km: f.proximo_km ? Number(f.proximo_km) : proxDefault, custo: f.custo ? Number(f.custo) : null, descricao: f.descricao.slice(0, 2000) || null,
+      proximo_km: f.proximo_km ? Number(f.proximo_km) : proxDefault, custo: f.custo ? Number(f.custo) : null, descricao: f.descricao.slice(0, 2000) || null, condutor: f.condutor.slice(0, 120) || null,
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Manutenção registrada"); setF({ ...f, proximo_km: "", custo: "", descricao: "" }); onDone();
@@ -292,6 +292,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
           <F label="Km"><Input type="number" min={0} value={f.km} onChange={(e) => setF({ ...f, km: e.target.value })} /></F>
           <F label="Próxima troca (km) — opcional"><Input type="number" min={0} value={f.proximo_km} onChange={(e) => setF({ ...f, proximo_km: e.target.value })} /></F>
           <F label="Custo (R$)"><Input type="number" step="0.01" min={0} value={f.custo} onChange={(e) => setF({ ...f, custo: e.target.value })} /></F>
+          <F label="Condutor"><Input maxLength={120} value={f.condutor} onChange={(e) => setF({ ...f, condutor: e.target.value })} /></F>
           <div className="sm:col-span-3"><F label="Descrição"><Textarea maxLength={2000} value={f.descricao} onChange={(e) => setF({ ...f, descricao: e.target.value })} /></F></div>
         </div>
         <div className="mt-4 flex justify-end"><Button onClick={add}>Registrar</Button></div>
@@ -307,7 +308,7 @@ function Manut({ v, lista, onDone }: { v: Veiculo; lista: { id: string; tipo: st
             {filtrada.map((m) => (
               <li key={m.id} className="flex items-start justify-between gap-4 py-3 text-sm">
                 <div>
-                  <div className="font-medium">{TIPOS_MANUTENCAO[m.tipo as TipoManutencao]} <span className="font-normal text-muted-foreground">· {fmtDate(m.data)} · {fmtKm(m.km)}</span></div>
+                  <div className="font-medium">{TIPOS_MANUTENCAO[m.tipo as TipoManutencao]} <span className="font-normal text-muted-foreground">· {fmtDate(m.data)} · {fmtKm(m.km)}{m.condutor ? ` · Condutor: ${m.condutor}` : ""}</span></div>
                   {m.descricao && <p className="mt-1 text-muted-foreground">{m.descricao}</p>}
                   {m.proximo_km && <p className="text-xs text-muted-foreground">Próxima: {fmtKm(m.proximo_km)}</p>}
                 </div>

@@ -7,6 +7,7 @@ import { F } from "@/components/VehicleForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fmtMoney } from "@/lib/fleet";
+import type { Tables } from "@/integrations/supabase/types";
 
 function Card({ title, children }: { title?: string; children: React.ReactNode }) {
   return <section className="rounded-xl border bg-card p-5 shadow-card">{title && <h3 className="mb-4 font-semibold">{title}</h3>}{children}</section>;
@@ -15,28 +16,29 @@ const Del = ({ onClick }: { onClick: () => void }) => (
   <button onClick={onClick} className="text-muted-foreground hover:text-destructive" aria-label="Excluir"><Trash2 className="h-4 w-4" /></button>
 );
 
-function useLista<T extends "acessorios" | "multas" | "arquivos_veiculo">(tabela: T, veiculoId: string, extra?: string) {
+function useLista<R>(tabela: "acessorios" | "multas" | "arquivos_veiculo", veiculoId: string, categoria?: string) {
   return useQuery({
-    queryKey: [tabela, veiculoId, extra],
+    queryKey: [tabela, veiculoId, categoria],
     queryFn: async () => {
-      let q = supabase.from(tabela).select("*").eq("veiculo_id", veiculoId);
-      if (extra) q = q.eq("categoria", extra);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let q: any = supabase.from(tabela).select("*").eq("veiculo_id", veiculoId);
+      if (categoria) q = q.eq("categoria", categoria);
       const { data, error } = await q.order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data as R[];
     },
   });
 }
 
 export function Acessorios({ veiculoId }: { veiculoId: string }) {
   const qc = useQueryClient();
-  const { data = [] } = useLista("acessorios", veiculoId);
+  const { data = [] } = useLista<Tables<"acessorios">>("acessorios", veiculoId);
   const vazio = { nome: "", patrimonio: "", observacao: "" };
   const [f, setF] = useState(vazio);
   const add = async () => {
-    if (!f.nome.trim()) return toast.error("Informe o item");
+    if (!f.nome.trim()) { toast.error("Informe o item"); return; }
     const { error } = await supabase.from("acessorios").insert({ veiculo_id: veiculoId, nome: f.nome.slice(0, 120), patrimonio: f.patrimonio.slice(0, 60) || null, observacao: f.observacao.slice(0, 500) || null });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setF(vazio); qc.invalidateQueries({ queryKey: ["acessorios"] });
   };
   const del = async (id: string) => { await supabase.from("acessorios").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["acessorios"] }); };
@@ -65,13 +67,13 @@ export function Acessorios({ veiculoId }: { veiculoId: string }) {
 
 export function Multas({ veiculoId }: { veiculoId: string }) {
   const qc = useQueryClient();
-  const { data = [] } = useLista("multas", veiculoId);
+  const { data = [] } = useLista<Tables<"multas">>("multas", veiculoId);
   const vazio = { data_hora: "", local: "", motorista: "", valor: "", infracao: "" };
   const [f, setF] = useState(vazio);
   const add = async () => {
-    if (!f.data_hora) return toast.error("Informe data e hora");
+    if (!f.data_hora) { toast.error("Informe data e hora"); return; }
     const { error } = await supabase.from("multas").insert({ veiculo_id: veiculoId, data_hora: new Date(f.data_hora).toISOString(), local: f.local.slice(0, 200) || null, motorista: f.motorista.slice(0, 120) || null, valor: f.valor ? Number(f.valor) : null, infracao: f.infracao.slice(0, 300) || null });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Multa registrada"); setF(vazio); qc.invalidateQueries({ queryKey: ["multas"] });
   };
   const del = async (id: string) => { if (confirm("Excluir multa?")) { await supabase.from("multas").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["multas"] }); } };
@@ -121,7 +123,7 @@ async function salvarNaPasta(blob: Blob, nome: string) {
 
 export function Arquivos({ veiculoId, categoria }: { veiculoId: string; categoria: "checklist" | "documento" }) {
   const qc = useQueryClient();
-  const { data = [] } = useLista("arquivos_veiculo", veiculoId, categoria);
+  const { data = [] } = useLista<Tables<"arquivos_veiculo">>("arquivos_veiculo", veiculoId, categoria);
   const [enviando, setEnviando] = useState(false);
   const fotos = categoria === "checklist";
 
@@ -139,7 +141,7 @@ export function Arquivos({ veiculoId, categoria }: { veiculoId: string; categori
   };
   const baixar = async (caminho: string, nome: string) => {
     const { data: b, error } = await supabase.storage.from("frota").download(caminho);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await salvarNaPasta(b, nome);
   };
   const del = async (id: string, caminho: string) => {
