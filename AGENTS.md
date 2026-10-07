@@ -10,6 +10,8 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Auth gate is client-side in `AppShell` wrapping each page; data access goes directly through the browser client with owner-scoped RLS (`user_id = auth.uid()`) — single-user app, no server functions needed.
+- AppShell verifies identity and loads database roles before rendering the shared fleet; role-scoped RLS enforces admin writes and member reads independently of UI.
+- Access context and AdminOnly hide mutation controls for consultants; user_roles is the only source of privileges.
+- Privileged user invitations/listing use authenticated server functions that verify the admin role before loading the admin client; invites let users set their own passwords.
 - Fleet business rules (contract time, km comparison, maintenance alerts) live in `src/lib/fleet.ts` so pages share one source of truth.
 - Team changes are recorded in `historico_equipes` and mirrored to `veiculos.equipe_id` for the current team.

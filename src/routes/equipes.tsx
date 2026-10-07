@@ -1,3 +1,4 @@
+import { AdminOnly } from "@/components/Access";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -11,6 +12,8 @@ import { Input } from "@/components/ui/input";
 export const Route = createFileRoute("/equipes")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Equipes — Frota" },
       { name: "description", content: "Cadastro das equipes que utilizam os veículos da frota." },
       { property: "og:title", content: "Equipes — Frota" },
@@ -52,10 +55,10 @@ function Equipes() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-semibold">Equipes</h1>
-      <form onSubmit={(e) => { e.preventDefault(); add.mutate(); }} className="flex max-w-md gap-2">
+      <AdminOnly><form onSubmit={(e) => { e.preventDefault(); add.mutate(); }} className="flex max-w-md gap-2">
         <Input placeholder="Nome da equipe" maxLength={80} value={nome} onChange={(e) => setNome(e.target.value)} />
         <Button disabled={add.isPending}>Adicionar</Button>
-      </form>
+      </form></AdminOnly>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {data?.equipes.map((q) => {
           const carros = data.veiculos.filter((v) => v.equipe_id === q.id);
@@ -63,7 +66,7 @@ function Equipes() {
             <div key={q.id} className="rounded-xl border bg-card p-4 shadow-card">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{q.nome}</h3>
-                <button onClick={() => confirm("Excluir equipe?") && del.mutate(q.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+                <AdminOnly><button onClick={() => confirm("Excluir equipe?") && del.mutate(q.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button></AdminOnly>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{carros.length ? carros.map((c) => c.placa).join(", ") : "Nenhum veículo"}</p>
             </div>

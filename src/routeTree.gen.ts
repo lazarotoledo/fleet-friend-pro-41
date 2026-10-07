@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EquipesRouteImport } from './routes/equipes'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RiscoRouteImport } from './routes/risco'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as VeiculosIdRouteImport } from './routes/veiculos.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,9 +26,19 @@ const EquipesRoute = EquipesRouteImport.update({
   path: '/equipes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RiscoRoute = RiscoRouteImport.update({
   id: '/risco',
   path: '/risco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VeiculosIdRoute = VeiculosIdRouteImport.update({
@@ -38,34 +50,61 @@ const VeiculosIdRoute = VeiculosIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/equipes': typeof EquipesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/equipes': typeof EquipesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/equipes': typeof EquipesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/equipes' | '/risco' | '/veiculos/$id'
+  fullPaths:
+    | '/'
+    | '/equipes'
+    | '/reset-password'
+    | '/risco'
+    | '/usuarios'
+    | '/veiculos/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/equipes' | '/risco' | '/veiculos/$id'
-  id: '__root__' | '/' | '/equipes' | '/risco' | '/veiculos/$id'
+  to:
+    | '/'
+    | '/equipes'
+    | '/reset-password'
+    | '/risco'
+    | '/usuarios'
+    | '/veiculos/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/equipes'
+    | '/reset-password'
+    | '/risco'
+    | '/usuarios'
+    | '/veiculos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EquipesRoute: typeof EquipesRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RiscoRoute: typeof RiscoRoute
+  UsuariosRoute: typeof UsuariosRoute
   VeiculosIdRoute: typeof VeiculosIdRoute
 }
 
@@ -85,11 +124,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/risco': {
       id: '/risco'
       path: '/risco'
       fullPath: '/risco'
       preLoaderRoute: typeof RiscoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/veiculos/$id': {
@@ -105,7 +158,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EquipesRoute: EquipesRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RiscoRoute: RiscoRoute,
+  UsuariosRoute: UsuariosRoute,
   VeiculosIdRoute: VeiculosIdRoute,
 }
 export const routeTree = rootRouteImport
