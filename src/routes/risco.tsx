@@ -27,17 +27,11 @@ export const Route = createFileRoute("/risco")({
   component: () => <AppShell><Risco /></AppShell>,
 });
 
-const riscoCor = { alto: "destructive", medio: "secondary", baixo: "outline" } as const;
-const riscoTxt = { alto: "Risco alto", medio: "Risco médio", baixo: "Risco baixo" };
-
 function Risco() {
   const qc = useQueryClient();
-  const analisar = useServerFn(analisarRisco);
   const [mes, setMes] = useState(() => new Date().toISOString().slice(0, 7));
   const [vals, setVals] = useState<Record<string, string>>({});
   const [salvando, setSalvando] = useState(false);
-  const [analise, setAnalise] = useState<AnaliseRisco | null>(null);
-  const [carregando, setCarregando] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["risco-dados"],
