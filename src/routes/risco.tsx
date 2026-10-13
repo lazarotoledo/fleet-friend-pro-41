@@ -1,17 +1,14 @@
 import { AdminOnly } from "@/components/Access";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Sparkles, Save, Loader2 } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { fmtKm, projecaoKm } from "@/lib/fleet";
-import { analisarRisco, type AnaliseRisco } from "@/lib/risco.functions";
 
 const title = "Quilometragem mensal e risco — Frota";
 const desc = "Registre o km mensal da frota e identifique veículos em risco de exceder o contrato.";
@@ -30,17 +27,11 @@ export const Route = createFileRoute("/risco")({
   component: () => <AppShell><Risco /></AppShell>,
 });
 
-const riscoCor = { alto: "destructive", medio: "secondary", baixo: "outline" } as const;
-const riscoTxt = { alto: "Risco alto", medio: "Risco médio", baixo: "Risco baixo" };
-
 function Risco() {
   const qc = useQueryClient();
-  const analisar = useServerFn(analisarRisco);
   const [mes, setMes] = useState(() => new Date().toISOString().slice(0, 7));
   const [vals, setVals] = useState<Record<string, string>>({});
   const [salvando, setSalvando] = useState(false);
-  const [analise, setAnalise] = useState<AnaliseRisco | null>(null);
-  const [carregando, setCarregando] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["risco-dados"],
@@ -76,20 +67,7 @@ function Risco() {
     return undefined;
   };
 
-  const rodarIA = async () => {
-    setCarregando(true);
-    try {
-      setAnalise(await analisar());
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setCarregando(false);
-    }
-  };
-
   const veiculos = data?.veiculos ?? [];
-  const placa = (id: string) => veiculos.find((v) => v.id === id)?.placa ?? "—";
-  const ordem = { alto: 0, medio: 1, baixo: 2 };
 
   return (
     <div className="space-y-8">
@@ -137,30 +115,34 @@ function Risco() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-xl font-semibold">Análise de risco com IA</h2>
-            <p className="text-sm text-muted-foreground">Identifica veículos que podem estourar o km contratado e sugere ações.</p>
-          </div>
-          <AdminOnly><Button onClick={rodarIA} disabled={carregando || !veiculos.length}>
-            {carregando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {carregando ? "Analisando…" : "Analisar frota"}
-          </Button></AdminOnly>
+        <div>
+          <h2 className="font-display text-xl font-semibold">Veículos em risco</h2>
+          <p className="text-sm text-muted-foreground">Projeção acima do limite contratado, calculada pela média dos últimos meses.</p>
         </div>
-        {analise && (
-          <div className="space-y-3">
-            <p className="rounded-lg border bg-card p-4 text-sm">{analise.resumo}</p>
-            {[...analise.veiculos].sort((a, b) => ordem[a.risco] - ordem[b.risco]).map((a) => (
-              <div key={a.veiculo_id} className="rounded-lg border bg-card p-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{placa(a.veiculo_id)}</span>
-                  <Badge variant={riscoCor[a.risco]}>{riscoTxt[a.risco]}</Badge>
+        {(() => {
+          const emRisco = veiculos
+            .map((v) => ({ v, p: projecaoKm(v, (data?.leituras ?? []).filter((l) => l.veiculo_id === v.id)) }))
+            .filter((x) => x.p.excesso != null && x.p.excesso > 0)
+            .sort((a, b) => (b.p.excesso ?? 0) - (a.p.excesso ?? 0));
+          if (!emRisco.length)
+            return <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">Nenhum veículo com projeção acima do limite contratado.</p>;
+          return (
+            <div className="space-y-3">
+              {emRisco.map(({ v, p }) => (
+                <div key={v.id} className="rounded-lg border bg-card p-4">
+                  <div className="flex items-center gap-2">
+                    <Link to="/veiculos/$id" params={{ id: v.id }} className="font-semibold hover:underline">{v.placa}</Link>
+                    <span className="text-sm text-muted-foreground">{v.modelo}</span>
+                  </div>
+                  <p className="mt-1 text-sm">
+                    Projeção de <strong className="text-destructive">{fmtKm(p.projetadoTotal!)}</strong> para um limite de {fmtKm(p.limiteTotal!)} — excesso estimado de <strong className="text-destructive">{fmtKm(p.excesso!)}</strong>.
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">Considere rodízio entre equipes, renegociar a franquia ou revisar as rotas.</p>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{a.motivo}</p>
-                <ul className="mt-2 list-disc pl-5 text-sm">{a.acoes.map((x, i) => <li key={i}>{x}</li>)}</ul>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          );
+        })()}
       </section>
     </div>
   );
