@@ -67,20 +67,7 @@ function Risco() {
     return undefined;
   };
 
-  const rodarIA = async () => {
-    setCarregando(true);
-    try {
-      setAnalise(await analisar());
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setCarregando(false);
-    }
-  };
-
   const veiculos = data?.veiculos ?? [];
-  const placa = (id: string) => veiculos.find((v) => v.id === id)?.placa ?? "—";
-  const ordem = { alto: 0, medio: 1, baixo: 2 };
 
   return (
     <div className="space-y-8">
