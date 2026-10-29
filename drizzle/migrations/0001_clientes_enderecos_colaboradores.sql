@@ -1,0 +1,14 @@
+CREATE TABLE public.clientes (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), nome text NOT NULL, documento text, telefone text, email text, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.enderecos (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), cliente_id uuid REFERENCES public.clientes(id) ON DELETE SET NULL, descricao text, logradouro text NOT NULL, cidade text, uf text, cep text, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.colaboradores (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), nome text NOT NULL, funcao text, telefone text, equipe_id uuid REFERENCES public.equipes(id) ON DELETE SET NULL, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.clientes, public.enderecos, public.colaboradores TO authenticated;
+GRANT ALL ON public.clientes, public.enderecos, public.colaboradores TO service_role;
+ALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.enderecos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.colaboradores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY member_read ON public.clientes FOR SELECT TO authenticated USING (public.is_member(auth.uid()));
+CREATE POLICY admin_write ON public.clientes FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+CREATE POLICY member_read ON public.enderecos FOR SELECT TO authenticated USING (public.is_member(auth.uid()));
+CREATE POLICY admin_write ON public.enderecos FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+CREATE POLICY member_read ON public.colaboradores FOR SELECT TO authenticated USING (public.is_member(auth.uid()));
+CREATE POLICY admin_write ON public.colaboradores FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));

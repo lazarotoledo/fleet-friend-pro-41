@@ -90,6 +90,118 @@ export type Database = {
           },
         ]
       }
+      clientes: {
+        Row: {
+          created_at: string
+          documento: string | null
+          email: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      colaboradores: {
+        Row: {
+          created_at: string
+          equipe_id: string | null
+          funcao: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipe_id?: string | null
+          funcao?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          equipe_id?: string | null
+          funcao?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_equipe_id_fkey"
+            columns: ["equipe_id"]
+            isOneToOne: false
+            referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enderecos: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cliente_id: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          logradouro: string
+          uf: string | null
+          user_id: string
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          logradouro: string
+          uf?: string | null
+          user_id?: string
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          logradouro?: string
+          uf?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enderecos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipes: {
         Row: {
           created_at: string
