@@ -72,7 +72,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/risco" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>
               Km & Risco
             </Link>
-            {role === "admin" && <Link to="/usuarios" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100">Usuários</Link>}
+            <Link to="/pessoas" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Pessoas</Link>
+            <Link to="/clientes" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Clientes</Link>
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="hidden opacity-75 sm:inline">{session.user.email}</span>
@@ -108,6 +109,17 @@ function Login() {
     if (r.error) toast.error("Não foi possível entrar com Google");
   };
 
+  const sso = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "custom:app-oidc" as never, options: { redirectTo: window.location.origin } });
+    if (error) toast.error("Login da intranet ainda não configurado.");
+  };
+
+  // Vindo da intranet com ?sso=1 → entra automaticamente pelo SSO
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("sso") === "1" && !p.get("code")) void sso();
+  }, []);
+
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="bg-hero hidden flex-col justify-between p-12 text-primary-foreground lg:flex">
@@ -124,6 +136,7 @@ function Login() {
           <div className="space-y-2"><Label>E-mail</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
           <div className="space-y-2"><Label>Senha</Label><Input type="password" required minLength={6} value={senha} onChange={(e) => setSenha(e.target.value)} /></div>
           <Button className="w-full" disabled={loading}>Entrar</Button>
+          <Button type="button" variant="secondary" className="w-full" onClick={sso}>Entrar com login da intranet</Button>
           <Button type="button" variant="outline" className="w-full" onClick={google}>Continuar com Google</Button>
           <Button type="button" variant="link" disabled={loading || !email.trim()} onClick={async () => {
             setLoading(true);

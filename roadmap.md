@@ -12,3 +12,8 @@
 - [x] Logins: Administrador (edita, cadastra usuários) e Consultor (só visualiza)
 - [x] Alertas na tela: km mensal acima do contratado e revisão próxima (até 1.000 km)
 - [ ] Repositório GitHub público — bloqueado: usuário precisa conectar pelo menu + → GitHub; não incluir segredos/dados da frota
+- [x] Organizar menu: Veículos, Equipes, Km & Risco, Pessoas (colaboradores + operadores), Clientes (clientes + endereços)
+- [x] Equipes: adicionar colaboradores por busca com sugestões
+- [x] Excluir cliente mantém endereços; confirmação dupla (cliente) e simples (endereço)
+- [ ] Login SSO da intranet (Keycloak/Authentik) — botão e entrada automática prontos; aguardando o usuário configurar o provedor
+- [ ] Quebra de semana na virada do mês — aguardando o usuário dizer em qual tela

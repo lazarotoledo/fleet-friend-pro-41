@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as EquipesRouteImport } from './routes/equipes'
+import { Route as PessoasRouteImport } from './routes/pessoas'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RiscoRouteImport } from './routes/risco'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
@@ -21,9 +23,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EquipesRoute = EquipesRouteImport.update({
   id: '/equipes',
   path: '/equipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PessoasRoute = PessoasRouteImport.update({
+  id: '/pessoas',
+  path: '/pessoas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -49,7 +61,9 @@ const VeiculosIdRoute = VeiculosIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
   '/usuarios': typeof UsuariosRoute
@@ -57,7 +71,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
   '/usuarios': typeof UsuariosRoute
@@ -66,7 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
   '/usuarios': typeof UsuariosRoute
@@ -76,7 +94,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/clientes'
     | '/equipes'
+    | '/pessoas'
     | '/reset-password'
     | '/risco'
     | '/usuarios'
@@ -84,7 +104,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/clientes'
     | '/equipes'
+    | '/pessoas'
     | '/reset-password'
     | '/risco'
     | '/usuarios'
@@ -92,7 +114,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/clientes'
     | '/equipes'
+    | '/pessoas'
     | '/reset-password'
     | '/risco'
     | '/usuarios'
@@ -101,7 +125,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClientesRoute: typeof ClientesRoute
   EquipesRoute: typeof EquipesRoute
+  PessoasRoute: typeof PessoasRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RiscoRoute: typeof RiscoRoute
   UsuariosRoute: typeof UsuariosRoute
@@ -117,11 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/equipes': {
       id: '/equipes'
       path: '/equipes'
       fullPath: '/equipes'
       preLoaderRoute: typeof EquipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pessoas': {
+      id: '/pessoas'
+      path: '/pessoas'
+      fullPath: '/pessoas'
+      preLoaderRoute: typeof PessoasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -157,7 +197,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClientesRoute: ClientesRoute,
   EquipesRoute: EquipesRoute,
+  PessoasRoute: PessoasRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RiscoRoute: RiscoRoute,
   UsuariosRoute: UsuariosRoute,
