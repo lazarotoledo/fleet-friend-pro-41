@@ -23,9 +23,21 @@ export function useEquipes() {
   });
 }
 
+export function useLocadoras() {
+  return useQuery({
+    queryKey: ["locadoras"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("locadoras").select("*").order("nome");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function VehicleForm({ initial, onSubmit, saving }: { initial?: VeiculoInput; onSubmit: (v: VeiculoInput) => void; saving?: boolean }) {
   const [v, setV] = useState<VeiculoInput>({ rastreado: false, km_inicial: 0, intervalo_oleo_km: 10000, intervalo_pneu_km: 40000, ...initial });
   const { data: equipes = [] } = useEquipes();
+  const { data: locadoras = [] } = useLocadoras();
   const set = (k: keyof VeiculoInput, val: unknown) => setV((p) => ({ ...p, [k]: val }));
   const isNew = !initial?.placa;
 
@@ -50,6 +62,12 @@ export function VehicleForm({ initial, onSubmit, saving }: { initial?: VeiculoIn
           </select>
         </F>
       )}
+      <F label="Locadora">
+        <select className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm" value={v.locadora_id ?? ""} onChange={(e) => set("locadora_id", e.target.value || null)}>
+          <option value="">Sem locadora</option>
+          {locadoras.map((q) => <option key={q.id} value={q.id}>{q.nome}</option>)}
+        </select>
+      </F>
       <div className="flex items-center gap-3 sm:col-span-2">
         <Switch checked={!!v.rastreado} onCheckedChange={(c) => set("rastreado", c)} /> <Label>Veículo rastreado</Label>
       </div>

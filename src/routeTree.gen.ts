@@ -10,17 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AcessoriosRouteImport } from './routes/acessorios'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as EquipesRouteImport } from './routes/equipes'
+import { Route as LocadorasRouteImport } from './routes/locadoras'
 import { Route as PessoasRouteImport } from './routes/pessoas'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RiscoRouteImport } from './routes/risco'
+import { Route as TicketlogRouteImport } from './routes/ticketlog'
 import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as VeiculosIdRouteImport } from './routes/veiculos.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcessoriosRoute = AcessoriosRouteImport.update({
+  id: '/acessorios',
+  path: '/acessorios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientesRoute = ClientesRouteImport.update({
@@ -31,6 +39,11 @@ const ClientesRoute = ClientesRouteImport.update({
 const EquipesRoute = EquipesRouteImport.update({
   id: '/equipes',
   path: '/equipes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocadorasRoute = LocadorasRouteImport.update({
+  id: '/locadoras',
+  path: '/locadoras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PessoasRoute = PessoasRouteImport.update({
@@ -48,6 +61,11 @@ const RiscoRoute = RiscoRouteImport.update({
   path: '/risco',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TicketlogRoute = TicketlogRouteImport.update({
+  id: '/ticketlog',
+  path: '/ticketlog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsuariosRoute = UsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
@@ -61,32 +79,41 @@ const VeiculosIdRoute = VeiculosIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acessorios': typeof AcessoriosRoute
   '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/locadoras': typeof LocadorasRoute
   '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/ticketlog': typeof TicketlogRoute
   '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acessorios': typeof AcessoriosRoute
   '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/locadoras': typeof LocadorasRoute
   '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/ticketlog': typeof TicketlogRoute
   '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/acessorios': typeof AcessoriosRoute
   '/clientes': typeof ClientesRoute
   '/equipes': typeof EquipesRoute
+  '/locadoras': typeof LocadorasRoute
   '/pessoas': typeof PessoasRoute
   '/reset-password': typeof ResetPasswordRoute
   '/risco': typeof RiscoRoute
+  '/ticketlog': typeof TicketlogRoute
   '/usuarios': typeof UsuariosRoute
   '/veiculos/$id': typeof VeiculosIdRoute
 }
@@ -94,42 +121,54 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/acessorios'
     | '/clientes'
     | '/equipes'
+    | '/locadoras'
     | '/pessoas'
     | '/reset-password'
     | '/risco'
+    | '/ticketlog'
     | '/usuarios'
     | '/veiculos/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/acessorios'
     | '/clientes'
     | '/equipes'
+    | '/locadoras'
     | '/pessoas'
     | '/reset-password'
     | '/risco'
+    | '/ticketlog'
     | '/usuarios'
     | '/veiculos/$id'
   id:
     | '__root__'
     | '/'
+    | '/acessorios'
     | '/clientes'
     | '/equipes'
+    | '/locadoras'
     | '/pessoas'
     | '/reset-password'
     | '/risco'
+    | '/ticketlog'
     | '/usuarios'
     | '/veiculos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcessoriosRoute: typeof AcessoriosRoute
   ClientesRoute: typeof ClientesRoute
   EquipesRoute: typeof EquipesRoute
+  LocadorasRoute: typeof LocadorasRoute
   PessoasRoute: typeof PessoasRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RiscoRoute: typeof RiscoRoute
+  TicketlogRoute: typeof TicketlogRoute
   UsuariosRoute: typeof UsuariosRoute
   VeiculosIdRoute: typeof VeiculosIdRoute
 }
@@ -141,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acessorios': {
+      id: '/acessorios'
+      path: '/acessorios'
+      fullPath: '/acessorios'
+      preLoaderRoute: typeof AcessoriosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clientes': {
@@ -155,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/equipes'
       fullPath: '/equipes'
       preLoaderRoute: typeof EquipesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locadoras': {
+      id: '/locadoras'
+      path: '/locadoras'
+      fullPath: '/locadoras'
+      preLoaderRoute: typeof LocadorasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pessoas': {
@@ -178,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RiscoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ticketlog': {
+      id: '/ticketlog'
+      path: '/ticketlog'
+      fullPath: '/ticketlog'
+      preLoaderRoute: typeof TicketlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/usuarios': {
       id: '/usuarios'
       path: '/usuarios'
@@ -197,11 +257,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcessoriosRoute: AcessoriosRoute,
   ClientesRoute: ClientesRoute,
   EquipesRoute: EquipesRoute,
+  LocadorasRoute: LocadorasRoute,
   PessoasRoute: PessoasRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RiscoRoute: RiscoRoute,
+  TicketlogRoute: TicketlogRoute,
   UsuariosRoute: UsuariosRoute,
   VeiculosIdRoute: VeiculosIdRoute,
 }

@@ -192,7 +192,7 @@ function Info({ v, hist, onDone }: { v: Veiculo; hist: { id: string; equipe_id: 
   );
 }
 
-function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; km: number }[]; onDone: () => void }) {
+function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; km: number; created_at?: string }[]; onDone: () => void }) {
   const [mes, setMes] = useState(new Date().toISOString().slice(0, 7));
   const [km, setKm] = useState("");
   const k = kmComparativo(v);
@@ -248,6 +248,30 @@ function Km({ v, leit, onDone }: { v: Veiculo; leit: { id: string; mes: string; 
               );
             })}
             <p className="pt-2 text-xs text-muted-foreground">Barra = km rodado no mês · linha = km mensal contratado</p>
+          </div>
+        )}
+      </Card>
+      <Card title="Registros preenchidos">
+        {linhas.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum registro ainda.</p> : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-muted-foreground"><tr><th className="py-2">Mês</th><th>Odômetro</th><th>Rodado no mês</th><th>Contratado</th><th>Saldo</th><th>Lançado em</th></tr></thead>
+              <tbody>
+                {[...linhas].reverse().map((l) => {
+                  const saldo = contratado != null ? contratado - l.rodado : null;
+                  return (
+                    <tr key={l.id} className="border-t">
+                      <td className="py-2 capitalize">{fmtMonth(l.mes)}</td>
+                      <td className="tabular-nums">{fmtKm(l.km)}</td>
+                      <td className="tabular-nums">{fmtKm(l.rodado)}</td>
+                      <td className="tabular-nums">{fmtKm(contratado)}</td>
+                      <td className={`tabular-nums ${saldo != null && saldo < 0 ? "text-destructive font-semibold" : ""}`}>{saldo == null ? "—" : fmtKm(saldo)}</td>
+                      <td className="text-muted-foreground">{l.created_at ? fmtDate(l.created_at.slice(0, 10)) : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </Card>

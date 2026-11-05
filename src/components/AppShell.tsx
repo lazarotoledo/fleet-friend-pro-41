@@ -74,6 +74,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
             <Link to="/pessoas" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Pessoas</Link>
             <Link to="/clientes" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Clientes</Link>
+            <Link to="/locadoras" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Locadoras</Link>
+            <Link to="/acessorios" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Acessórios</Link>
+            <Link to="/ticketlog" className="rounded-md px-3 py-1.5 opacity-80 hover:opacity-100" activeProps={{ className: "bg-primary-foreground/15 opacity-100" }}>Ticket Log</Link>
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="hidden opacity-75 sm:inline">{session.user.email}</span>
