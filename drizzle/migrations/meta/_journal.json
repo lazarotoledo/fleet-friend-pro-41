@@ -15,6 +15,13 @@
       "when": 1793297012223,
       "tag": "0001_clientes_enderecos_colaboradores",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793881496742,
+      "tag": "0002_locadoras_abastecimentos",
+      "breakpoints": true
     }
   ]
 }

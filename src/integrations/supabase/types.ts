@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      abastecimentos: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          km: number | null
+          litros: number
+          motorista: string | null
+          posto: string | null
+          user_id: string
+          valor: number
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          id?: string
+          km?: number | null
+          litros: number
+          motorista?: string | null
+          posto?: string | null
+          user_id?: string
+          valor: number
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          km?: number | null
+          litros?: number
+          motorista?: string | null
+          posto?: string | null
+          user_id?: string
+          valor?: number
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abastecimentos_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       acessorios: {
         Row: {
           created_at: string
@@ -303,6 +350,36 @@ export type Database = {
           },
         ]
       }
+      locadoras: {
+        Row: {
+          contato: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          user_id: string
+        }
+        Insert: {
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Update: {
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       manutencoes: {
         Row: {
           condutor: string | null
@@ -474,6 +551,7 @@ export type Database = {
           km_atual: number
           km_inicial: number
           km_mensal_contratado: number | null
+          locadora_id: string | null
           modelo: string | null
           placa: string
           rastreado: boolean
@@ -494,6 +572,7 @@ export type Database = {
           km_atual?: number
           km_inicial?: number
           km_mensal_contratado?: number | null
+          locadora_id?: string | null
           modelo?: string | null
           placa: string
           rastreado?: boolean
@@ -514,6 +593,7 @@ export type Database = {
           km_atual?: number
           km_inicial?: number
           km_mensal_contratado?: number | null
+          locadora_id?: string | null
           modelo?: string | null
           placa?: string
           rastreado?: boolean
@@ -526,6 +606,13 @@ export type Database = {
             columns: ["equipe_id"]
             isOneToOne: false
             referencedRelation: "equipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "veiculos_locadora_id_fkey"
+            columns: ["locadora_id"]
+            isOneToOne: false
+            referencedRelation: "locadoras"
             referencedColumns: ["id"]
           },
         ]
