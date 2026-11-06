@@ -28,7 +28,7 @@ const sel = "h-9 w-full rounded-md border border-input bg-background px-3 text-s
 const fmtL = (n: number) => `${n.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} L`;
 
 function fimMes(mes: string) {
-  const [y, m] = mes.split("-").map(Number);
+  const [y = 2000, m = 1] = mes.split("-").map(Number);
   return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
 }
 
